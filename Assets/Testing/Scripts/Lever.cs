@@ -1,8 +1,8 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Example2 : MonoBehaviour
+public class Lever : MonoBehaviour
 {
     private Quaternion _newRotation;
     private Vector3 _mousePosition;
@@ -23,6 +23,7 @@ public class Example2 : MonoBehaviour
 
     void Start()
     {
+       	_newRotation = new Quaternion();
 
 		_startRotation = transform.rotation;
 		_startDirection = transform.up;

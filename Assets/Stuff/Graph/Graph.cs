@@ -31,12 +31,26 @@ public class Graph : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		float t = Time.time;
 		for (int i = 0; i < points.Length; ++i)
 		{
 			Transform point = points[i];
 			Vector3 position = point.localPosition;
-			position.y = Mathf.Sin(Mathf.PI * (position.x + Time.time));
+			position.y = MultiSineFunction(position.x, t);
 			point.localPosition = position;
 		}
+	}
+
+	float SineFunction(float x, float t) 
+	{
+		return Mathf.Sin(Mathf.PI * (x + t));
+	}
+
+	float MultiSineFunction(float x, float t)
+	{
+		float y = Mathf.Sin(Mathf.PI * (x + t));
+		y += Mathf.Sin(2f * Mathf.PI * (x + t)) / 2f;
+		y *= 2f / 3f;
+		return y;
 	}
 }

@@ -44,8 +44,8 @@ public class BeatSync : MonoBehaviour {
 		// 	}
 		// 	initialized = true;
 		// }
-		
-		timer += Time.deltaTime;
+		if (!beat)
+			timer += Time.deltaTime;
 		if (timer >= timeToBeat && !beat)
 		{
 			beat = true;
@@ -53,16 +53,19 @@ public class BeatSync : MonoBehaviour {
 			timeToBeat = Random.Range(BeatInterval, BeatInterval + BeatRandomization);
 			beatStartTime = Time.time;
 		}
-		
+		Debug.Log("Beat: " + beat);
+		Debug.Log("Beat dir: " + beatDir);
 		if (beat)
 		{
 			if (!beatDir)
 			{
-				if (beatPulse > 0.48f)
+				beatPulse += (Time.deltaTime * 2f / BeatDuration) * BeatStrength;
+				if (beatPulse > BeatStrength - 0.1f)
 					beatDir = true;
 			}
 			else
 			{
+				beatPulse -= (Time.deltaTime * 2f / BeatDuration) * BeatStrength;
 				if (beatPulse < 0.1f)
 				{
 					beatDir = false;
@@ -71,16 +74,13 @@ public class BeatSync : MonoBehaviour {
 				}
 			}
 
-			if (beat)
-				beatPulse = Mathf.PingPong(((Time.time - beatStartTime) / BeatDuration) * BeatStrength, BeatStrength);
+				
 		}
 
 		for (int i = 0; i < beatingObjects.Count; ++i)
 		{
 			beatingObjects[i].localScale = origScale[i] * (1 + beatPulse);
 		}
-
-		Debug.Log(1f / Time.deltaTime);
 	}
 
 	public void AddObject(Transform trans)

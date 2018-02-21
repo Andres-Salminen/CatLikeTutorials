@@ -330,9 +330,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BeatDuration: 0.2
-  BeatInterval: 0.5
+  BeatInterval: 2
   BeatRandomization: 0.5
-  BeatStrength: 0.5
+  BeatStrength: 10
 --- !u!4 &939275180
 Transform:
   m_ObjectHideFlags: 0
