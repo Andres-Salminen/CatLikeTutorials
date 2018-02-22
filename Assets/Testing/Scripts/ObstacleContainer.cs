@@ -14,11 +14,14 @@ public class ObstacleContainer {
 		CurrentObstacleData = new List<ObstacleData>();
 		CancelledObstacleData = new List<ObstacleData>();
 
+		
+		/*
 		// Test code start.
 		ObstacleData data = new ObstacleData();
 		data.Position = Vector3.zero; data.Rotation = Quaternion.identity; data.Scale = Vector3.one; data.ObjectType = "Cube";
 		CurrentObstacleData.Add(data);
 		// Test code end.
+		*/
 	}
 
 }
