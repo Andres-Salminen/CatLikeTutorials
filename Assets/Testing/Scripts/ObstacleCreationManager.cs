@@ -5,7 +5,7 @@ using System.IO;
 
 [System.Serializable]
 public struct PrefabInfo {
-	public string Key;
+	public ObjectTypes Key;
 	public GameObject prefab;
 }
 
@@ -21,19 +21,25 @@ public struct CircleInfo {
 	}
 }
 
+public enum ObjectTypes
+{		
+	Cube,
+	Cylinder
+};
+
 
 public class ObstacleCreationManager : MonoBehaviour {
 
 
 	[SerializeField]
 	private PrefabInfo[] _keyPrefabPairsEditor;
+	private GameObject[] _prefabs;
 	private const string SaveFile = "obstacles.json";
 
 	// The Container for all the obstacle data. Contains rotation, position, scale, object type and a nonserialized reference to the object transform.
 
 	[SerializeField]
 	private ObstacleContainer ObstacleDataContainer;
-	private Dictionary<string, GameObject> _obstaclePrefabs = new Dictionary<string, GameObject>();
 
 
 
@@ -43,19 +49,21 @@ public class ObstacleCreationManager : MonoBehaviour {
 	private Vector3[] _referencePoints = new Vector3[5];
 	//private Vector3 _referencePointThree;
 
-	public enum ObjectTypes
-	{
-		Cube,
-		Cylinder
-	};
+
 
 	// Use this for initialization
 	void Start () {
 
+		_prefabs = new GameObject[_keyPrefabPairsEditor.Length];
 		foreach (var pI in _keyPrefabPairsEditor)
 		{
-			_obstaclePrefabs.Add(pI.Key, pI.prefab);
+			if (_prefabs[(int)pI.Key] == null)
+				_prefabs[(int)pI.Key] = pI.prefab;
+			else
+				throw new System.Exception("Multiple prefabs with same key!");
 		}
+
+		
 		
 		LoadData();
 		// Perhaps change later to persistentDataPath or additional folders etc.
@@ -202,17 +210,10 @@ public class ObstacleCreationManager : MonoBehaviour {
 			ObstacleDataContainer.CancelledObstacleData.RemoveAt(indexOfLast);
 			if (cancelData.ReferenceToObstacle == null)
 			{
-				GameObject go;
-				_obstaclePrefabs.TryGetValue(cancelData.ObjectType, out go);
-				if (go != null)
-				{
-					Transform reference = GameObject.Instantiate(go, cancelData.Position, cancelData.Rotation, this.transform).transform;
-					reference.localScale = cancelData.Scale;
-					cancelData.ReferenceToObstacle = reference;
-					ObstacleDataContainer.CurrentObstacleData.Add(cancelData);
-				}
-				else
-					Debug.LogWarning("Did not find a prefab with object type key. You might be missing a reference from the dictionary or the key did not match the object type.");
+				Transform reference = GameObject.Instantiate(_prefabs[(int)cancelData.ObjectType], cancelData.Position, cancelData.Rotation, this.transform).transform;
+				reference.localScale = cancelData.Scale;
+				cancelData.ReferenceToObstacle = reference;
+				ObstacleDataContainer.CurrentObstacleData.Add(cancelData);
 			}
 			else
 				Debug.LogWarning("Something be broke. Cancelled data has a reference to an obstacle (should not happen).");
@@ -230,7 +231,6 @@ public class ObstacleCreationManager : MonoBehaviour {
 		Vector3 position;
 		Vector3 scale;
 		Quaternion rotation;
-		string objectType = type.ToString();
 		ObstacleData obsData;
 
 		for (int i = 0; i < _enteringReferencePoint + 1; ++i)
@@ -253,7 +253,7 @@ public class ObstacleCreationManager : MonoBehaviour {
 
 				position.y += scale.y / 2f;
 
-				obsData = CreateObstacleDataAndInstantiate(position, rotation, scale, objectType);
+				obsData = CreateObstacleDataAndInstantiate(position, rotation, scale, _creatingType);
 
 				ObstacleDataContainer.CurrentObstacleData.Add(obsData);
 
@@ -280,7 +280,7 @@ public class ObstacleCreationManager : MonoBehaviour {
 				
 				position.y += scale.y;
 				
-				obsData = CreateObstacleDataAndInstantiate(position, rotation, scale, objectType);
+				obsData = CreateObstacleDataAndInstantiate(position, rotation, scale, _creatingType);
 
 				ObstacleDataContainer.CurrentObstacleData.Add(obsData);
 
@@ -294,7 +294,7 @@ public class ObstacleCreationManager : MonoBehaviour {
 		SaveData();
 	}
 
-	ObstacleData CreateObstacleDataAndInstantiate(Vector3 position, Quaternion rotation, Vector3 scale, string objectType)
+	ObstacleData CreateObstacleDataAndInstantiate(Vector3 position, Quaternion rotation, Vector3 scale, ObjectTypes objectType)
 	{
 		ObstacleData obsData = new ObstacleData();
 		obsData.Position = position;
@@ -309,31 +309,17 @@ public class ObstacleCreationManager : MonoBehaviour {
 
 	void InstantiateWithData(ref ObstacleData obsData)
 	{
-		GameObject prefab = null;
-		_obstaclePrefabs.TryGetValue(obsData.ObjectType, out prefab);
-		if (prefab != null)
-		{
-			GameObject go = GameObject.Instantiate(prefab, obsData.Position, obsData.Rotation, this.transform);
-			go.transform.localScale = obsData.Scale;
-			obsData.ReferenceToObstacle = go.transform;
-		}
-		else
-			Debug.LogWarning("Did not find a prefab with object type key. You might be missing a reference from the dictionary or the key did not match the object type.");
+		obsData.ReferenceToObstacle = GameObject.Instantiate(
+			_prefabs[(int)obsData.ObjectType], obsData.Position, obsData.Rotation, this.transform)
+			.transform;
+		obsData.ReferenceToObstacle.localScale = obsData.Scale;
 	}
 
 	ObstacleData InstantiateWithData(ObstacleData obsData)
 	{
-		GameObject prefab = null;
-		_obstaclePrefabs.TryGetValue(obsData.ObjectType, out prefab);
-		if (prefab != null)
-		{
-			GameObject go = GameObject.Instantiate(prefab, obsData.Position, obsData.Rotation, this.transform);
-			go.transform.localScale = obsData.Scale;
-			obsData.ReferenceToObstacle = go.transform;
-		}
-		else
-			Debug.LogWarning("Did not find a prefab with object type key. You might be missing a reference from the dictionary or the key did not match the object type.");
 
+		obsData.ReferenceToObstacle = GameObject.Instantiate(_prefabs[(int)obsData.ObjectType], obsData.Position, obsData.Rotation, this.transform).transform;
+		obsData.ReferenceToObstacle.localScale = obsData.Scale;
 		return obsData;
 	}
 
