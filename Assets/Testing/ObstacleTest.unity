@@ -137,20 +137,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 907971016}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 89d0c12cac14a4143846800be56c94ee, type: 3}
+  m_Script: {fileID: 11500000, guid: 7335397fe5b02be4a9dac61fc5b377a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _keyPrefabPairsEditor:
-  - Key: Cube
-    prefab: {fileID: 1494751619555666, guid: 06aeab2ca65dc914193350f9025c0316, type: 2}
-  - Key: Cylinder
-    prefab: {fileID: 1943718314631082, guid: c2ab5090e02f52c4584e27e785be0d15, type: 2}
+  - Key: 0
+    prefab: {fileID: 1494751619555666, guid: aa68817271ef68a41879a499534c861d, type: 2}
+  - Key: 1
+    prefab: {fileID: 1943718314631082, guid: 9b47015a0c4f5d74493bed2dd1e546ae, type: 2}
   ObstacleDataContainer:
-    CurrentObstacleData:
-    - Position: {x: 0, y: 0, z: 0}
-      Scale: {x: 0, y: 0, z: 0}
-      Rotation: {x: 0, y: 0, z: 0, w: 0}
-      ObjectType: 
+    CurrentObstacleData: []
 --- !u!4 &907971018
 Transform:
   m_ObjectHideFlags: 0
