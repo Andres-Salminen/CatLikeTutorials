@@ -9,16 +9,27 @@ public class FPSCounter : MonoBehaviour {
 	public ReactiveProperty<int> HighestFPS { get; private set; }
 	public ReactiveProperty<int> LowestFPS { get; private set; }
 
+	public ReactiveProperty<float> AverageMS { get; private set; }
+	public ReactiveProperty<float> HighestMS { get; private set; }
+	public ReactiveProperty<float> LowestMS { get; private set; }
+
 	[SerializeField] private int _avgFrameRange = 60;
 
 	private int[] _fpsBuffer;
+	private float[] _msBuffer;
 	private int _fpsBufferIndex;
+	private int _msBufferIndex;
+	
 
 	// Use this for initialization
 	void Awake () {
 		AverageFPS = new ReactiveProperty<int>(0);
 		HighestFPS = new ReactiveProperty<int>(0);
 		LowestFPS = new ReactiveProperty<int>(99);
+
+		AverageMS = new ReactiveProperty<float>(0f);
+		HighestMS = new ReactiveProperty<float>(0f);
+		LowestMS = new ReactiveProperty<float>(99f);
 	}
 	
 	// Update is called once per frame
@@ -26,8 +37,10 @@ public class FPSCounter : MonoBehaviour {
 		if (_fpsBuffer == null || _fpsBuffer.Length != _avgFrameRange)
 			InitializeBuffer();
 		
-		UpdateBuffer();
+		UpdateBuffers();
 		CalculateFPS();
+		CalculateMS();
+
 	}
 
 	void InitializeBuffer()
@@ -36,15 +49,22 @@ public class FPSCounter : MonoBehaviour {
 			_avgFrameRange = 1;
 		
 		_fpsBuffer = new int[_avgFrameRange];
+		_msBuffer = new float[_avgFrameRange];
 		_fpsBufferIndex = 0;
+		_msBufferIndex = 0;
 	}
 
-	void UpdateBuffer()
+	void UpdateBuffers()
 	{
 		_fpsBuffer[_fpsBufferIndex++] = (int) (1f / Time.unscaledDeltaTime);
 
 		if (_fpsBufferIndex >= _avgFrameRange)
 			_fpsBufferIndex = 0;
+
+		_msBuffer[_msBufferIndex++] = Time.unscaledDeltaTime * 1000f;
+
+		if (_msBufferIndex >= _avgFrameRange)
+			_msBufferIndex = 0;
 	}
 
 	void CalculateFPS() 
@@ -66,5 +86,26 @@ public class FPSCounter : MonoBehaviour {
 		AverageFPS.Value = sum / _avgFrameRange;
 		HighestFPS.Value = highest;
 		LowestFPS.Value = lowest;
+	}
+
+	void CalculateMS()
+	{
+		float sum = 0f;
+		float highest = 0f;
+		float lowest = float.MaxValue;
+		
+		for (int i = 0; i < _avgFrameRange; i++)
+		{
+			float ms = _msBuffer[i];
+			sum += ms;
+			if (ms > highest)
+				highest = ms;
+			if (ms < lowest)
+				lowest = ms;
+		}
+
+		AverageMS.Value = sum / _avgFrameRange;
+		HighestMS.Value = highest;
+		LowestMS.Value = lowest;
 	}
 }

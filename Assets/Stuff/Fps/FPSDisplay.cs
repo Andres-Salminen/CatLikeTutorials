@@ -20,20 +20,35 @@ public class FPSDisplay : MonoBehaviour {
 		"90", "91", "92", "93", "94", "95", "96", "97", "98", "99"
 	};
 
+	[SerializeField]
+	private FPSColor[] _coloring;
+
 	private FPSCounter _fpsCounter;
 
-	[SerializeField] private Text _avgFPSLabel, _lowestFPSLabel, _highestFPSLabel;
+	[SerializeField] private Text _highestFPSLabel, _avgFPSLabel, _lowestFPSLabel, _highestMSLabel, _avgMSLabel, _lowestMSLabel;
 
 
 	void Start () {
 		_fpsCounter = GetComponent<FPSCounter>();
-		_fpsCounter.AverageFPS.Subscribe(x => _avgFPSLabel.text = stringsFrom00To99[Mathf.Clamp(x, 0, 99)]);
-		_fpsCounter.HighestFPS.Subscribe(x => _highestFPSLabel.text = stringsFrom00To99[Mathf.Clamp(x, 0, 99)]);
-		_fpsCounter.LowestFPS.Subscribe(x => _lowestFPSLabel.text = stringsFrom00To99[Mathf.Clamp(x, 0, 99)]);
+		_fpsCounter.AverageFPS.Subscribe(x => DisplayFPSColor(_avgFPSLabel, x));
+		_fpsCounter.HighestFPS.Subscribe(x => DisplayFPSColor(_highestFPSLabel, x));
+		_fpsCounter.LowestFPS.Subscribe(x => DisplayFPSColor(_lowestFPSLabel, x));
+
+		_fpsCounter.AverageMS.Subscribe(x => _avgMSLabel.text = x.ToString("0.000" + " ms"));
+		_fpsCounter.HighestMS.Subscribe(x => _highestMSLabel.text = x.ToString("0.000" + " ms"));
+		_fpsCounter.LowestMS.Subscribe(x => _lowestMSLabel.text = x.ToString("0.000" + " ms"));
 	}
 	
-	// Update is called once per frame
-	void Update () {
-		
+	void DisplayFPSColor (Text label, int value)
+	{
+		label.text = stringsFrom00To99[Mathf.Clamp(value, 0, 99)];
+		for (int i = 0; i < _coloring.Length; i++)
+		{
+			if (value >= _coloring[i].MinimumValue)
+			{
+				label.color = _coloring[i].Color;
+				break;
+			}
+		}
 	}
 }
