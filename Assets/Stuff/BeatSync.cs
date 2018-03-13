@@ -4,24 +4,24 @@ using UnityEngine;
 
 public class BeatSync : MonoBehaviour {
 
-	bool beat = false;
-	bool beatDir = false;
-	float beatPulse = 0f;
-	public float BeatDuration = 0.2f;
-	public float BeatInterval = 0.5f;
-	public float BeatRandomization = 0.5f;
+	private bool _beat = false;
+	private bool _beatDir = false;
+	private float _beatPulse = 0f;
+	[SerializeField] private float _beatDuration = 0.2f;
+	[SerializeField] private float _beatInterval = 0.5f;
+	[SerializeField] private float _beatRandomization = 0.5f;
 
-	float timeToBeat;
-	float timer = 0f;
-	float beatStartTime = 0f;
+	private float _timeToBeat;
+	private float _timer = 0f;
+	private float _beatStartTime = 0f;
 
-	public float BeatStrength = 0.5f;
+	[SerializeField] private float _beatStrength = 0.5f;
 
-	List<Vector3> origScale = new List<Vector3>();
-	List<Transform> beatingObjects = new List<Transform>();
+	private List<Vector3> _origScale = new List<Vector3>();
+	private List<Transform> _beatingObjects = new List<Transform>();
 	public static BeatSync Instance;
 
-	bool initialized = false;
+	private bool _initialized = false;
 
 	// Use this for initialization
 	void Awake () {
@@ -44,48 +44,48 @@ public class BeatSync : MonoBehaviour {
 		// 	}
 		// 	initialized = true;
 		// }
-		if (!beat)
-			timer += Time.deltaTime;
-		if (timer >= timeToBeat && !beat)
+		if (!_beat)
+			_timer += Time.deltaTime;
+		if (_timer >= _timeToBeat && !_beat)
 		{
-			beat = true;
-			timer = 0f;
-			timeToBeat = Random.Range(BeatInterval, BeatInterval + BeatRandomization);
-			beatStartTime = Time.time;
+			_beat = true;
+			_timer = 0f;
+			_timeToBeat = Random.Range(_beatInterval, _beatInterval + _beatRandomization);
+			_beatStartTime = Time.time;
 		}
-		Debug.Log("Beat: " + beat);
-		Debug.Log("Beat dir: " + beatDir);
-		if (beat)
+		Debug.Log("Beat: " + _beat);
+		Debug.Log("Beat dir: " + _beatDir);
+		if (_beat)
 		{
-			if (!beatDir)
+			if (!_beatDir)
 			{
-				beatPulse += (Time.deltaTime * 2f / BeatDuration) * BeatStrength;
-				if (beatPulse > BeatStrength - 0.1f)
-					beatDir = true;
+				_beatPulse += (Time.deltaTime * 2f / _beatDuration) * _beatStrength;
+				if (_beatPulse > _beatStrength - 0.1f)
+					_beatDir = true;
 			}
 			else
 			{
-				beatPulse -= (Time.deltaTime * 2f / BeatDuration) * BeatStrength;
-				if (beatPulse < 0.1f)
+				_beatPulse -= (Time.deltaTime * 2f / _beatDuration) * _beatStrength;
+				if (_beatPulse < 0.1f)
 				{
-					beatDir = false;
-					beat = false;
-					beatPulse = 0f;
+					_beatDir = false;
+					_beat = false;
+					_beatPulse = 0f;
 				}
 			}
 
 				
 		}
 
-		for (int i = 0; i < beatingObjects.Count; ++i)
+		for (int i = 0; i < _beatingObjects.Count; ++i)
 		{
-			beatingObjects[i].localScale = origScale[i] * (1 + beatPulse);
+			_beatingObjects[i].localScale = _origScale[i] * (1 + _beatPulse);
 		}
 	}
 
 	public void AddObject(Transform trans)
 	{
-		beatingObjects.Add(trans);
-		origScale.Add(trans.localScale);
+		_beatingObjects.Add(trans);
+		_origScale.Add(trans.localScale);
 	}
 }
