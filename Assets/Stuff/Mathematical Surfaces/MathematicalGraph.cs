@@ -18,7 +18,7 @@ public class MathematicalGraph : MonoBehaviour {
 
 	const float _pi = Mathf.PI;
 
-	static GraphFunction[] _functions = { SineFunction, Sine2DFunction, MultiSineFunction };
+	static GraphFunction[] _functions = { SineFunction, Sine2DFunction, MultiSineFunction, MultiSine2DFunction };
 
 	// Use this for initialization
 	void Awake () {
@@ -79,6 +79,15 @@ public class MathematicalGraph : MonoBehaviour {
 		float y = Mathf.Sin(_pi * (x + t));
 		y += Mathf.Sin(2f * _pi * (x + t)) / 2f;
 		y *= 2f / 3f;
+		return y;
+	}
+
+	static float MultiSine2DFunction(float x, float z, float t)
+	{
+		float y = 4f* Mathf.Sin(_pi * (x + z + t * 0.5f));
+		y += Mathf.Sin(_pi * (x + t));
+		y += Mathf.Sin(2f * _pi * (z + 2f * t)) + 0.5f;
+		y *= 1f / 5.5f;
 		return y;
 	}
 }
