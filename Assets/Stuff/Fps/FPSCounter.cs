@@ -23,6 +23,8 @@ public class FPSCounter : MonoBehaviour {
 
 	// Use this for initialization
 	void Awake () {
+		Application.targetFrameRate = 300;
+
 		AverageFPS = new ReactiveProperty<int>(0);
 		HighestFPS = new ReactiveProperty<int>(0);
 		LowestFPS = new ReactiveProperty<int>(99);
@@ -56,15 +58,9 @@ public class FPSCounter : MonoBehaviour {
 
 	void UpdateBuffers()
 	{
-		_fpsBuffer[_fpsBufferIndex++] = (int) (1f / Time.unscaledDeltaTime);
+		_fpsBuffer[_fpsBufferIndex++ % _fpsBuffer.Length] = (int) (1f / Time.unscaledDeltaTime);
 
-		if (_fpsBufferIndex >= _avgFrameRange)
-			_fpsBufferIndex = 0;
-
-		_msBuffer[_msBufferIndex++] = Time.unscaledDeltaTime * 1000f;
-
-		if (_msBufferIndex >= _avgFrameRange)
-			_msBufferIndex = 0;
+		_msBuffer[_msBufferIndex++ % _msBuffer.Length] = Time.unscaledDeltaTime * 1000f;
 	}
 
 	void CalculateFPS() 
