@@ -6,9 +6,8 @@ public class BeatScript : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		BeatSync syncronizer = BeatSync.Instance;
-		if (syncronizer != null)
-			syncronizer.AddObject(transform);
+		if (BeatSync.Instance != null)
+			BeatSync.Instance.AddObject(transform);
 	}
 	
 	// Update is called once per frame

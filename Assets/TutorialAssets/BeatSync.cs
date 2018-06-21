@@ -1,4 +1,8 @@
-﻿using System.Collections;
+﻿// The script with pulse the scale of many objects
+// synchronized with each other. Akin to the beat of the heart.
+
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,6 +11,7 @@ public class BeatSync : MonoBehaviour {
 	private bool _beat = false;
 	private bool _beatDir = false;
 	private float _beatPulse = 0f;
+	
 	[SerializeField] private float _beatDuration = 0.2f;
 	[SerializeField] private float _beatInterval = 0.5f;
 	[SerializeField] private float _beatRandomization = 0.5f;
@@ -27,65 +32,72 @@ public class BeatSync : MonoBehaviour {
 	void Awake () {
 		if (Instance == null)
 			Instance = this;
-		else
+		else if (Instance != this)
 		{
-			Debug.Log("Please have only one BeatSync script in a scene!");
 			Destroy(gameObject);
 		}
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		// if (!initialized)
-		// {
-		// 	foreach (var trans in beatingObjects)
-		// 	{
-		// 		origScale.Add(trans.localScale);
-		// 	}
-		// 	initialized = true;
-		// }
+
 		if (!_beat)
 			_timer += Time.deltaTime;
+
 		if (_timer >= _timeToBeat && !_beat)
-		{
-			_beat = true;
-			_timer = 0f;
-			_timeToBeat = Random.Range(_beatInterval, _beatInterval + _beatRandomization);
-			_beatStartTime = Time.time;
+		{	
+			ActivateBeat();
 		}
-		Debug.Log("Beat: " + _beat);
-		Debug.Log("Beat dir: " + _beatDir);
+
 		if (_beat)
 		{
-			if (!_beatDir)
-			{
-				_beatPulse += (Time.deltaTime * 2f / _beatDuration) * _beatStrength;
-				if (_beatPulse > _beatStrength - 0.1f)
-					_beatDir = true;
-			}
-			else
-			{
-				_beatPulse -= (Time.deltaTime * 2f / _beatDuration) * _beatStrength;
-				if (_beatPulse < 0.1f)
-				{
-					_beatDir = false;
-					_beat = false;
-					_beatPulse = 0f;
-				}
-			}
-
-				
+			UpdateBeat();
 		}
 
-		for (int i = 0; i < _beatingObjects.Count; ++i)
-		{
-			_beatingObjects[i].localScale = _origScale[i] * (1 + _beatPulse);
-		}
+		UpdateScale();
 	}
 
 	public void AddObject(Transform trans)
 	{
 		_beatingObjects.Add(trans);
 		_origScale.Add(trans.localScale);
+	}
+
+	private void ActivateBeat()
+	{
+		_beat = true;
+		_timer = 0f;
+		_timeToBeat = Random.Range(_beatInterval, _beatInterval + _beatRandomization);
+		_beatStartTime = Time.time;
+	}
+
+	private void UpdateBeat()
+	{
+		// false = forward, true = backward
+
+		if (!_beatDir)
+		{
+			_beatPulse += (Time.deltaTime * 2f / _beatDuration) * _beatStrength;
+			if (_beatPulse > _beatStrength - 0.1f)
+				_beatDir = true;
+		}
+		else
+		{
+			_beatPulse -= (Time.deltaTime * 2f / _beatDuration) * _beatStrength;
+			if (_beatPulse < 0.1f)
+			{
+				_beatDir = false;
+				_beat = false;
+				_beatPulse = 0f;
+			}
+		}
+	}
+
+	private void UpdateScale()
+	{
+		for (int i = 0; i < _beatingObjects.Count; ++i)
+		{
+			_beatingObjects[i].localScale = _origScale[i] * (1 + _beatPulse);
+		}
 	}
 }
